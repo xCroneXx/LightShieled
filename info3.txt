@@ -1,3 +1,4 @@
+print('hallo')
 function isRandom(resource)
     if #resource > 10 then
         local table1 = {}
