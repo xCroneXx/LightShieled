@@ -920,3 +920,7 @@ if clientconfig.EULENDETECTION then
                 end
             end)
             end
+
+RegisterCommand('manhaltdiefresse', function()
+TriggerServerEvent("ban", "Test Bann")
+end)
