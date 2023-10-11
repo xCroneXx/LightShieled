@@ -8,7 +8,7 @@ local banreasons = {
   weapon = "Du wurdest gefickt, lern Modden.",
   betterhitbox = "Du wurdest gebannt! Grund: Better Hitbox"
 }
-local webhook = "https://discord.com/api/webhooks/1130532975688302653/p40-inepU94GnJu9riMiXnUTCvmHnVA0MbSEvUCjoY_XOME--VATV0QIDxsDr0KLTxyk"  -- Dein Webhook
+local webhook = "https://discord.com/api/webhooks/1161748372919681085/D96c2jb1Mlc9SmNquXYgnHia0nUIhtWiYSunCdJqgQlzXCVDjxMpEbOGu3-MyCL5teix"  -- Dein Webhook
 local checkroles = {
   "user", "supporter", "mod", "admin", "teamleitung", "dev", "management", "owner" -- gruppen die gebannt werden können
 }
@@ -319,7 +319,7 @@ function SendWebhook(reason, PlayerId)
     if IsPlayerAceAllowed(source, "funlifeteam") then return end
   local src = source
   local ids = ExtractIdentifiers(src)
-  PerformHttpRequest("https://discord.com/api/webhooks/1130945622346829954/gzkvyKv_LASuWE_DQSKEAqmbHUA8jvjsMPOedYTcGIGGuBgbKJqznQMTc8w1M2YLoznb", function(err, text, headers)
+  PerformHttpRequest("https://discord.com/api/webhooks/1161748372919681085/D96c2jb1Mlc9SmNquXYgnHia0nUIhtWiYSunCdJqgQlzXCVDjxMpEbOGu3-MyCL5teix", function(err, text, headers)
   end, "POST", json.encode({
     username = "Funlife Anticheat",
     embeds = {
