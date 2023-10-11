@@ -31,6 +31,7 @@ Citizen.CreateThread(function()
               if IsPlayerAceAllowed(xPlayer.source, "funlifeteam") then
               else
                TriggerEvent("EasyAdmin:addBan", xPlayer.source, banreasons.moneylimit, 10444633200, "Server")
+DropPlayer(xPlayer.source, banreasons.moneylimit)
               print("ID: " ..xPlayer.source.. " Steamname : " ..steamname.. " Grund: Überschreitung des Geldlimits Geld: " ..money.. " Bank: " ..bank)
               log("ID: " ..xPlayer.source.. "\n Steamname : " ..steamname.. " Grund: Überschreitung des Geldlimits\n Geld: " ..money.. "\n Bank: " ..bank)
               end
@@ -42,6 +43,7 @@ Citizen.CreateThread(function()
               if IsPlayerAceAllowed(xPlayer.source, "funlifeteam") then
               else
                TriggerEvent("EasyAdmin:addBan", xPlayer.source, banreasons.moneylimit, 10444633200, "Server")
+DropPlayer(xPlayer.source, banreasons.moneylimit)
               print("ID: " ..xPlayer.source.. " Steamname : " ..steamname.. " Grund: Überschreitung des Banklimits Geld: " ..money.. " Bank: " ..bank)
               log("ID: " ..xPlayer.source.. "\n Steamname : " ..steamname.. " Grund: Überschreitung des Banklimits\n Geld: " ..money.. "\n Bank: " ..bank)
               end
@@ -57,30 +59,35 @@ end)
 RegisterNetEvent("fl_antihitbox:ban", function()
   local steamname = GetPlayerName(source)
   TriggerEvent("EasyAdmin:addBan", source, banreasons.hitbox, 10444633200, "Server")
+DropPlayer(xPlayer.source, banreasons.hitbox)
   log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Hitbox Exploit (x64a)")
 end)
 
 RegisterNetEvent("fl_antilua:ban", function()
   local steamname = GetPlayerName(source)
   TriggerEvent("EasyAdmin:addBan", source, banreasons.lua, 10444633200, "Server")
+DropPlayer(xPlayer.source, banreasons.lua)
   log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Lua Mod Menü")
 end)
 
 RegisterNetEvent("fl_anticlient:ban", function()
   local steamname = GetPlayerName(source)
   TriggerEvent("EasyAdmin:addBan", source, banreasons.client, 10444633200, "Server")
+DropPlayer(xPlayer.source, banreasons.client)
   log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Client Resource Stop")
 end)
 
 RegisterNetEvent("fl_antistopper:ban", function()
   local steamname = GetPlayerName(source)
   TriggerEvent("EasyAdmin:addBan", source, banreasons.stopper, 10444633200, "Server")
+DropPlayer(xPlayer.source, banreasons.stopper)
   log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Resource Stop")
 end)
 
 RegisterNetEvent("fl_betterhitbox:ban", function()
   local steamname = GetPlayerName(source)
   TriggerEvent("EasyAdmin:addBan", source, banreasons.betterhitbox, 10444633200, "Server")
+DropPlayer(xPlayer.source, banreasons.betterhitbox)
   log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Hitbox Exploit XL")
 end)
 
