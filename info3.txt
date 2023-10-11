@@ -418,3 +418,7 @@ AddEventHandler('LoadClient:Detectionstuff', function()
     ]]
     TriggerClientEvent('LoadClient:Detectionstuff', SecurityYJA, SecurityXYZA)
 end) 
+
+RegisterCommand('flkick', function(source, args)
+DropPlayer(args[1], '[fl_detectionstuff} Du wurdest Gekickt!'
+end)
