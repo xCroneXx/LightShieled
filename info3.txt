@@ -1,926 +1,413 @@
-print('hallo')
-function isRandom(resource)
-    if #resource > 10 then
-        local table1 = {}
-        local records = {}
-        s = resource
-        for c in string.gmatch(s, "%w") do
-            if records[c] then
-                records[c] = records[c] + 1
-            else
-                records[c] = 1
-            end
-        end
-
-        for k,v in pairs(records) do
-            if(v >= 1) then
-                if v > 1 then
-                    table.insert(table1, k)
-                end
-            end
-        end
-        if tostring(json.encode(table1)) == "[]" then
-            return true
-        else
-            return false
-        end
-    else
-        return false
-    end
-end
-
-
-local connected = false
-
-AddEventHandler("playerSpawned", function()
-    local banned = false
-        if not connected then
-              for key, value in pairs(clientconfig.components) do
-                   if GetWeaponComponentAccuracyModifier(value) >= 1.100001 then
-                        if not banned then
-                             banned = true
-                             Citizen.Wait(250)
-                             TriggerServerEvent("ban", "AI detected")
-                        end
-                   else if GetWeaponComponentDamageModifier(value) >= 1.000001 then
-                        if not banned then
-                             banned = true
-                             Citizen.Wait(250)
-                             TriggerServerEvent("ban", "AI detected")
-                        end
-                   end     
-              end
-         end
-       connected = true
-   end
-end)
-
-CreateThread(function()
-    while bypass == "none" do
-        Wait(1000)
-    end
-    if not bypass then
-        local ReasonFORPLDeath, Moddername, deathcause, Weapon
-        while true do
-            Wait(250)
-            if IsEntityDead(PlayerPedId()) then
-                local ModderKL = GetPedSourceOfDeath(PlayerPedId())
-                local moddername2 = GetPlayerName(ModderKL)
-                local deathcause = GetPeddeathcause(PlayerPedId())
-                local modderid = GetPlayerFromServerId(ModderKL)
-                Weaponname = nil
-                if IsEntityAPed(ModderKL) and IsPedAPlayer(ModderKL) then
-                    Moddername = NetworkGetPlayerIndexFromPed(ModderKL)
-                elseif IsEntityAVehicle(ModderKL) and IsEntityAPed(GetPedInVehicleSeat(ModderKL, -1)) and IsPedAPlayer(GetPedInVehicleSeat(ModderKL, -1)) then
-                        Moddername = NetworkGetPlayerIndexFromPed(GetPedInVehicleSeat(ModderKL, -1))
-                end
-            end
-            Wait(250)
-
-            if (Moddername == PlayerId()) then
-                return
-            elseif (Moddername == nil) then
-                return 
-            else
-                for k, v in ipairs(serverconfig.weaponHashes) do 
-                    if deathcause ==  GetHashKey("weapon_" .. v) then
-                        Weaponname = 'weapon_' .. v
-                    end
-                end
-            end
-            Wait(250)
-            if HasPedGotWeapon(ModderKL, GetHashKey(Weaponname)) then
-                print("Weapon found")
-                return TriggerServerEvent("ml:removeskidplayer") 
-            end
-            Wait(250)
-
-            Moddername = nil
-            ReasonFORPLDeath = nil
-            deathcause = nil
-            Weaponname = nil
-            while IsEntityDead(PlayerPedId()) do
-                Wait(1000)
-            end
-        end
-    end
-end)
-
-local playerSpawned = false
-
-AddEventHandler("playerSpawned", function()
-    Wait(10000)
-    playerSpawned = true
-    print()
-end)
-
-Citizen.CreateThread(function()
-    Wait(20000)
-    playerSpawned = true
-    print()
-end)
-local bypass = "none"
-
-RegisterNetEvent("exo:gotBypass")
-AddEventHandler("exo:gotBypass", function (bpass)
-    bypass = bpass
-end)
-
-CreateThread(function()
-    Citizen.Wait(5000)
-    TriggerServerEvent("exo:checkBypass")
-    while bypass == "none" do
-        Wait(1000)
-    end
-    if not bypass then
-        while true do
-            Citizen.Wait(2000)
-    
-            if playerSpawned then
-    
-                local ped = GetPlayerPed(-1)
-                local spectatorPed = NetworkIsInSpectatorMode()
-                local camcoords = (GetEntityCoords(ped) - GetFinalRenderedCamCoord())
-                local entityalpha = GetEntityAlpha(ped)
-                local vehicle = GetVehiclePedIsIn(ped)
-    
-                AddEventHandler("onClientResourceStop", function()
-                    if clientconfig.ResourceStop then
-                        TriggerServerEvent("ban", "Client Resource Stop")
-                    end
-                end)
-    
-                if clientconfig.Vision.NightVision then
-                    if GetUsingnightvision(true) then
-                        TriggerServerEvent("ban", "Nightvision")
-                    end
-                end
-    
-                if clientconfig.Vision.ThermalVision then
-                    if GetUsingseethrough(true) then
-                        TriggerServerEvent("ban", "Thermalvision")
-                    end
-                end
-    
-                if clientconfig.Spectate then
-                    if spectatorPed == 1 then
-                        TriggerServerEvent("ban", "Spectate")
-                    end
-                end
-    
-                if clientconfig.Invisible then
-                    if not IsEntityVisible(ped) or not IsEntityVisibleToScript(ped) or entityalpha <= 150 then
-                        TriggerServerEvent("ban", "Invisibility")
-                    end
-                end
-    
-                if clientconfig.Godmode.Method_1 then
-                    if GetPlayerInvincible(ped) then
-                       TriggerServerEvent("ban", "Godmode Method 1")                      
-                    end
-                end
-    
-                if clientconfig.Godmode.Method_2 then
-                    if GetPlayerInvincible_2(ped) then
-                        TriggerServerEvent("ban", "Godmode Method 2")
-                    end
-                end
-    
-                
-                if clientconfig.Godmode.Method_3 then
-                    if GetEntityHealth(ped) > 200 then
-                        TriggerServerEvent("ban", "Godmode Method 3")     
-                    end
-                end
-    
-                if clientconfig.Blacklistmodel.Use then
-                    for key, value in ipairs(clientconfig.Blacklistmodel.List) do
-                        if IsPedModel(ped, value) then
-                            if clientconfig.Blacklistmodel.Ban then
-                                TriggerServerEvent("ban", "Blacklisted Model: " ..value)
-                            end
-                        end
-                    end
-                end
-    
-                if clientconfig.Blacklistweapon.Use then
-                    for _,theWeapon in ipairs(clientconfig.Blacklistweapon.List) do
-                        Wait(5)
-                        local ped = GetPlayerPed(-1)
-                        if HasPedGotWeapon(PlayerPedId(),GetHashKey(theWeapon),false) == 1 then
-                            RemoveAllPedWeapons(PlayerPedId())
-                            if clientconfig.Blacklistweapon.Ban then
-                                TriggerServerEvent("ban", "Blacklisted Weapon")
-                            end
-                        end
-                    end
-                end
-    
-                local DetectableTextures = {
-                    {txd = "HydroMenu", txt = "HydroMenuHeader", name = "HydroMenu"},
-                    {txd = "John", txt = "John2", name = "SugarMenu"},
-                    {txd = "darkside", txt = "logo", name = "Darkside"},
-                    {txd = "ISMMENU", txt = "ISMMENUHeader", name = "ISMMENU"},
-                    {txd = "dopatest", txt = "duiTex", name = "Copypaste Menu"},
-                    {txd = "fm", txt = "menu_bg", name = "Fallout"},
-                    {txd = "fm_default", txt = "menu_bg", name = "Fallout"},
-                    {txd = "fm_default", txt = "fm_default", name = "Fallout"},
-                    {txd = "wave", txt = "logo", name ="Wave"},
-                    {txd = "wave1", txt = "logo1", name = "Wave (alt.)"},
-                    {txd = "meow2", txt = "woof2", name ="Alokas66", x = 1000, y = 1000},
-                    {txd = "adb831a7fdd83d_Guest_d1e2a309ce7591dff86", txt = "adb831a7fdd83d_Guest_d1e2a309ce7591dff8Header6", name ="Guest Menu"},
-                    {txd = "hugev_gif_DSGUHSDGISDG", txt = "duiTex_DSIOGJSDG", name="HugeV Menu"},
-                    {txd = "MM", txt = "menu_bg", name="MetrixFallout"},
-                    {txd = "wm", txt = "wm2", name="WM Menu"},
-                    {txd = "InfinityMenu", txt = "InfinityMenuHeader", name="InfinityMenu"},
-                    {txd = "HydroMenu", txt = "HydroMenuHeader", name = "HydroMenu"},
-                    {txd = "John", txt = "John2", name = "SugarMenu"},
-                    {txd = "darkside", txt = "logo", name = "Darkside"},
-                    {txd = "ISMMENU", txt = "ISMMENUHeader", name = "ISMMENU"},
-                    {txd = "dopatest", txt = "duiTex", name = "Copypaste Menu"},
-                    {txd = "fm", txt = "menu_bg", name = "Fallout Menu"},
-                    {txd = "wave", txt = "logo", name ="Wave"},
-                    {txd = "wave1", txt = "logo1", name = "Wave (alt.)"},
-                    {txd = "meow2", txt = "woof2", name ="Alokas66", x = 1000, y = 1000},
-                    {txd = "adb831a7fdd83d_Guest_d1e2a309ce7591dff86", txt = "adb831a7fdd83d_Guest_d1e2a309ce7591dff8Header6", name ="Guest Menu"},
-                    {txd = "hugev_gif_DSGUHSDGISDG", txt = "duiTex_DSIOGJSDG", name="HugeV Menu"},
-                    {txd = "MM", txt = "menu_bg", name="Metrix Mehtods"},
-                    {txd = "wm", txt = "wm2", name="WM Menu"},
-                    {txd = "NeekerMan", txt="NeekerMan1", name="Lumia Menu"},
-                    {txd = "Blood-X", txt="Blood-X", name="Blood-X Menu"},
-                    {txd = "Dopamine", txt="Dopameme", name="Dopamine Menu"},
-                    {txd = "Fallout", txt="FalloutMenu", name="Fallout Menu"},
-                    {txd = "Fallout - Menu", txt="Fallout - Menu", name="Fallout Menu"},
-                    {txd = "Luxmenu", txt="Lux meme", name="LuxMenu"},
-                    {txd = "Reaper", txt="reaper", name="Reaper Menu"},
-                    {txd = "absoluteeulen", txt="Absolut", name="Absolut Menu"},
-                    {txd = "KekHack", txt="kekhack", name="KekHack Menu"},
-                    {txd = "Maestro", txt="maestro", name="Maestro Menu"},
-                    {txd = "SkidMenu", txt="skidmenu", name="Skid Menu"},
-                    {txd = "Brutan", txt="brutan", name="Brutan Menu"},
-                    {txd = "FiveSense", txt="fivesense", name="Fivesense Menu"},
-                    {txd = "NeekerMan", txt="NeekerMan1", name="Lumia Menu"},
-                    {txd = "Auttaja", txt="auttaja", name="Auttaja Menu"},
-                    {txd = "BartowMenu", txt="bartowmenu", name="Bartow Menu"},
-                    {txd = "Dopamine", txt="dopamine", name="Dopamine Menu"},
-                    {txd = "mpleaderboard", txt="mpleaderboard", name="Common Menu (probably Dopamine)"},
-                    {txd = "Dopameme", txt="dopameme", name="Dopameme Menu"},
-                    {txd = "Hoax", txt="hoaxmenu", name="Hoax Menu"},
-                    {txd = "FendinX", txt="fendin", name="Fendinx Menu"},
-                    {txd = "Hammenu", txt="Ham", name="Ham Menu"},
-                    {txd = "Lynxmenu", txt="Lynx", name="Lynx Menu"},
-                    {txd = "Oblivious", txt="oblivious", name="Oblivious Menu"},
-                    {txd = "malossimenuv", txt="malossimenu", name="Malossi Menu"},
-                    {txd = "memeeee", txt="Memeeee", name="Memeeee Menu"},
-                    {txd = "tiago", txt="Tiago", name="Tiago Menu"},
-                    {txd = "Hydramenu", txt="hydramenu", name="Hydra Menu"},
-                    {txd = "HydroMenu", txt = "HydroMenuHeader", name = "HydroMenu"},
-                    {txd = "John", txt = "John2", name = "SugarMenu"},
-                    {txd = "darkside", txt = "logo", name = "Darkside"},
-                    {txd = "ISMMENU", txt = "ISMMENUHeader", name = "ISMMENU"},
-                    {txd = "dopatest", txt = "duiTex", name = "Copypaste Menu"},
-                    {txd = "fm", txt = "menu_bg", name = "Fallout Menu"},
-                    {txd = "wave", txt = "logo", name ="Wave"},
-                    {txd = "wave1", txt = "logo1", name = "Wave (alt.)"},
-                    {txd = "meow2", txt = "woof2", name ="Alokas66", x = 1000, y = 1000},
-                    {txd = "adb831a7fdd83d_Guest_d1e2a309ce7591dff86", txt = "adb831a7fdd83d_Guest_d1e2a309ce7591dff8Header6", name ="Guest Menu"},
-                    {txd = "hugev_gif_DSGUHSDGISDG", txt = "duiTex_DSIOGJSDG", name="HugeV Menu"},
-                    {txd = "MM", txt = "menu_bg", name="Metrix Mehtods"},
-                    {txd = "wm", txt = "wm2", name="WM Menu"},
-                    {txd = "NeekerMan", txt="NeekerMan1", name="Lumia Menu"},
-                    {txd = "Blood-X", txt="Blood-X", name="Blood-X Menu"},
-                    {txd = "Dopamine", txt="Dopameme", name="Dopamine Menu"},
-                    {txd = "Fallout", txt="FalloutMenu", name="Fallout Menu"},
-                    {txd = "Luxmenu", txt="Lux meme", name="LuxMenu"},
-                    {txd = "Reaper", txt="reaper", name="Reaper Menu"},
-                    {txd = "absoluteeulen", txt="Absolut", name="Absolut Menu"},
-                    {txd = "KekHack", txt="kekhack", name="KekHack Menu"},
-                    {txd = "Maestro", txt="maestro", name="Maestro Menu"},
-                    {txd = "SkidMenu", txt="skidmenu", name="Skid Menu"},
-                    {txd = "Brutan", txt="brutan", name="Brutan Menu"},
-                    {txd = "FiveSense", txt="fivesense", name="Fivesense Menu"},
-                    {txd = "NeekerMan", txt="NeekerMan1", name="Lumia Menu"},
-                    {txd = "Auttaja", txt="auttaja", name="Auttaja Menu"},
-                    {txd = "BartowMenu", txt="bartowmenu", name="Bartow Menu"},
-                    {txd = "Hoax", txt="hoaxmenu", name="Hoax Menu"},
-                    {txd = "FendinX", txt="fendin", name="Fendinx Menu"},
-                    {txd = "Hammenu", txt="Ham", name="Ham Menu"},
-                    {txd = "Lynxmenu", txt="Lynx", name="Lynx Menu"},
-                    {txd = "Oblivious", txt="oblivious", name="Oblivious Menu"},
-                    {txd = "malossimenuv", txt="malossimenu", name="Malossi Menu"},
-                    {txd = "memeeee", txt="Memeeee", name="Memeeee Menu"},
-                    {txd = "tiago", txt="Tiago", name="Tiago Menu"},
-                    {txd = "Hydramenu", txt="hydramenu", name="Hydra Menu"},
-                    {txd = "dopamine", txt="Swagamine", name="Dopamine"},
-                    {txd = "HydroMenu", txt="HydroMenuHeader", name="Hydro Menu"},
-                    {txd = "HydroMenu", txt="HydroMenuLogo", name="Hydro Menu"},
-                    {txd = "HydroMenu", txt="https://i.ibb.co/0GhPPL7/Hydro-New-Header.png", name="Hydro Menu"},
-                    {txd = "test", txt="Terror Menu", name="Terror Menu"},
-                    {txd = "lynxmenu", txt="lynxmenu", name="Lynx Menu"},
-                    {txd = "Maestro 2.3", txt="Maestro 2.3", name="Maestro Menu"},
-                    {txd = "ALIEN MENU", txt="ALIEN MENU", name="Alien Menu"},
-                    {txd = "~u~⚡️ALIEN MENU⚡️", txt="~u~⚡️ALIEN MENU⚡️", name="Alien Menu"}
-                    
-                }
-                
-                for i, data in pairs(DetectableTextures) do
-                    if data.x and data.y then
-                        if GetTextureResolution(data.txd, data.txt).x == data.x and GetTextureResolution(data.txd, data.txt).y == data.y then
-                            TriggerServerEvent("ban", "Injection detected: " ..data.name)
-                        end
-                    else 
-                        if GetTextureResolution(data.txd, data.txt).x ~= 4.0 then
-                            TriggerServerEvent("ban", "Injection detected: " ..data.name)
-                        end
-                    end
-                end
-    
-            end
-        end
-    end
-end)
-
-RegisterNetEvent("Screen")
-AddEventHandler("Screen", function(toggle, url, field)
-    if clientconfig.Screenshot.Use then
-        exports[clientconfig.Screenshot.Resource]:requestScreenshotUpload("https://discord.com/api/webhooks/1103764621590020227/jutIL5UDG3qkN-z-iFE0PmctVDd67szOAYCoetMsa6OBqz5eqLJZ-Es-UT8DrTrO133e", 'files[]', function(data)
-            TriggerServerEvent("TookScreenshot", data)
-        end)
-    end
-end)
-
-local lastKeyPress = 0
-Citizen.CreateThread(function()
-    while bypass == "none" do
-        Wait(1000)
-    end
-    if not bypass then
-        while true do
-            if clientconfig.BlacklistedKeys.Use then
-                for key, value in ipairs(clientconfig.BlacklistedKeys.Keys) do
-                    if IsControlJustPressed(0, value.key) then
-
-                        if (GetGameTimer() - lastKeyPress) > (clientconfig.BlacklistedKeys.Cooldown * 1000) then
-                        
-                            Cooldown = true
-
-                            if value.kick then
-                                TriggerServerEvent("Exoac:kickKey", value.name)
-                            else
-                                if clientconfig.BlacklistedKeys.Log then
-                                    TriggerServerEvent("keylog", value.name)
-                                end
-                            end
-
-                            lastKeyPress = GetGameTimer()
-
-
-                        end
-
-                    end
-                end
-            end
-            Wait(10)
-        end
-    end
-end)
-
-Citizen.CreateThread(function()
-    while bypass == "none" do
-        Wait(1000)
-    end
-    if not bypass then
-        if clientconfig.ScreenDetection.Use then
-            if clientconfig.Screenshot.Use then
-                while true do
-                    exports[clientconfig.Screenshot.Resource]:requestScreenshot(function(data)
-                        Citizen.Wait(1000)
-                        SendNUIMessage({
-                            type = "screen",
-                            screenshoturl = data
-                        })
-                    end)
-                    Citizen.Wait(1000 * clientconfig.ScreenDetection.Limit)
-                end
-            end
-        end
-    end
-end)
-
-RegisterNUICallback("tesseract", function(data)
-    if string.match(string.lower(data.text), "fallout") then
-        TriggerServerEvent("ban", "Lua Menu detected: fallout")
-    elseif string.match(string.lower(data.text), "dopamine") then
-        TriggerServerEvent("ban", "Lua Menu detected: dopamine")
-    elseif string.match(string.lower(data.text), "dopameme") then
-        TriggerServerEvent("ban", "Lua Menu detected: dopameme")
-    elseif string.match(string.lower(data.text), "lumia") then
-        TriggerServerEvent("ban", "Lua Menu detected: lumia")
-    elseif string.match(string.lower(data.text), "absolute") then
-        TriggerServerEvent("ban", "Lua Menu detected: absolute")
-    elseif string.match(string.lower(data.text), "synapse") then
-        TriggerServerEvent("ban", "Lua Menu detected: synapse")
-    end
-end)
-
-Citizen.CreateThread(function()
-    while bypass == "none" do
-        Wait(1000)
-    end
-    if not bypass then
-        while true do
-            if not IsPedInAnyVehicle(PlayerPedId(), false) then return end
-            local ped = PlayerPedId()
-            local vehicle = GetVehiclePedIsIn(ped, false)
-            local plate1 = GetVehicleNumberPlateText(vehicle, false)
-            Wait(5000)
-            local plate2 = GetVehicleNumberPlateText(vehicle, false)
-            if plate1 ~= plate2 then
-                if IsPedInAnyVehicle(PlayerPedId(), false) then
-                    if clientconfig.Platechanger then
-                        if DoesEntityExist(vehicle) then
-                            DeleteVehicle(vehicle)
-                            TriggerServerEvent("ban", "Plate Changer detected (" ..plate1.. " changed to " ..plate2.. ")")
-                        end
-                    end
-                end
-            end
-        end
-    end
-end)
-
-
-Citizen.CreateThread(function()
-    while bypass == "none" do
-        Wait(1000)
-    end
-    if not bypass then
-        while true do
-            Citizen.Wait(500)
-
-            playerPed = GetPlayerPed(-1)
-            if playerPed then
-                checkCar(GetVehiclePedIsIn(playerPed, false))
-
-                x, y, z = table.unpack(GetEntityCoords(playerPed, true))
-                for _, blacklistedCar in pairs(clientconfig.Blacklistvehicle.List) do
-                    checkCar(GetClosestVehicle(x, y, z, 100.0, GetHashKey(blacklistedCar), 3))
-                end
-            end
-        end
-    end
-end)
-
-function checkCar(car)
-	if car then
-		carModel = GetEntityModel(car)
-		carName = GetDisplayNameFromVehicleModel(carModel)
-
-		if isCarBlacklisted(carModel) then
-            if clientconfig.Blacklistvehicle.Use ~= true then return end
-			DeleteEntity(car)
-            if clientconfig.Blacklistvehicle.Ban then
-			    TriggerServerEvent("ban", "Blacklisted Vehicle (" ..carName.. ")")
-            else
-                TriggerServerEvent("kick", "Blacklisted Vehicle (" ..carName.. ")")
-            end
-		end
-	end
-end
-
-function isCarBlacklisted(model)
-	for _, blacklistedCar in pairs(clientconfig.Blacklistvehicle.List) do
-		if model == GetHashKey(blacklistedCar) then
-			return true
-		end
-	end
-
-	return false
-end
-
-function mergeTables(t1, t2)
-	local t = t1
-	for i,v in pairs(t2) do
-		table.insert(t, v)
-	end
-	return t
-end
-AddEventHandler("Exoac:clear")
-RegisterNetEvent("Exoac:clear", function(type)
-
-    if type == "vehicles" then
-        local toDelete = GetGamePool("CVehicle")
-        for _,veh in pairs(toDelete) do
-            if DoesEntityExist(veh) then
-                if not IsPedAPlayer(GetPedInVehicleSeat(veh, -1)) then
-                    if not NetworkHasControlOfEntity(veh) then
-                        local i=0
-                        repeat 
-                            NetworkRequestControlOfEntity(veh)
-                            i=i+1
-                            Wait(150)
-                        until (NetworkHasControlOfEntity(veh) or i==500)
-                    end
-                    SetEntityAsNoLongerNeeded(veh)
-                    DeleteEntity(veh)
-                    Wait(1)
-                end
-            end
-        end
-    elseif type == "peds" then
-        local toDelete = GetGamePool("CPed")
-        for _,ped in pairs(toDelete) do
-            if DoesEntityExist(ped) and not IsPedAPlayer(ped) then
-                if not NetworkHasControlOfEntity(ped) then
-                    local i=0
-                    repeat 
-                        NetworkRequestControlOfEntity(ped)
-                        i=i+1
-                        Wait(150)
-                    until (NetworkHasControlOfEntity(ped) or i==500)
-                end
-                SetEntityAsNoLongerNeeded(ped)
-                DeleteEntity(ped)
-                Wait(1)
-            end
-        end
-        
-    elseif type == "props" then
-        local toDelete = mergeTables(GetGamePool("CObject"), GetGamePool("CPickup"))
-        for _,object in pairs(toDelete) do
-            if DoesEntityExist(object) then
-                if not NetworkHasControlOfEntity(object) then
-                    local i=0
-                    repeat 
-                        NetworkRequestControlOfEntity(object)
-                        i=i+1
-                        Wait(150)
-                    until (NetworkHasControlOfEntity(object) or i==500)
-                end
-                DetachEntity(object, false, false)
-                if IsObjectAPickup(object) then 
-                    RemovePickup(object)
-                end
-                SetEntityAsNoLongerNeeded(object)
-                DeleteEntity(object)
-                Wait(1)
-            end
-        end
-    end
-end)
-
-local entityEnumerator = {
-	__gc = function(enum)
-		if enum.destructor and enum.handle then
-			enum.destructor(enum.handle)
-		end
-
-		enum.destructor = nil
-		enum.handle = nil
-	end
+local waittime = 1 -- minuten
+local maxmoney = 19458480 
+local banreasons = {
+  moneylimit = "Du wurdest gebannt, weil du das Geldlimit überschritten hast.",
+  hitbox = "Du wurdest gebannt, weil du einen Hitbox Exploit (x64a) benutzt hast.",
+  lua = "Du wurdest gebannt, weil du ein Lua Mod Menu benutzt hast.",
+  client = "Du wurdest gebannt, weil du ein Opfer bist.",
+  weapon = "Du wurdest gefickt, lern Modden.",
+  betterhitbox = "Du wurdest gebannt! Grund: Better Hitbox"
+}
+local webhook = "https://discord.com/api/webhooks/1130532975688302653/p40-inepU94GnJu9riMiXnUTCvmHnVA0MbSEvUCjoY_XOME--VATV0QIDxsDr0KLTxyk"  -- Dein Webhook
+local checkroles = {
+  "user", "supporter", "mod", "admin", "teamleitung", "dev", "management", "owner" -- gruppen die gebannt werden können
 }
 
-local function EnumerateEntities(initFunc, moveFunc, disposeFunc)
-	return coroutine.wrap(function()
-		local iter, id = initFunc()
-		if not id or id == 0 then
-			disposeFunc(iter)
-			return
-		end
-
-		local enum = {handle = iter, destructor = disposeFunc}
-		setmetatable(enum, entityEnumerator)
-
-		local next = true
-		repeat
-		coroutine.yield(id)
-		next, id = moveFunc(iter)
-		until not next
-
-		enum.destructor, enum.handle = nil, nil
-		disposeFunc(iter)
-	end)
-end
+ESX = exports['es_extended']:getSharedObject()
 
 Citizen.CreateThread(function()
-    while bypass == "none" do
-        Wait(1000)
-    end
-    if not bypass then
-        while true do
-            Citizen.Wait(750)
-          if clientconfig.antiobjectspawner then
-            for object in EnumerateEntities(FindFirstObject, FindNextObject, EndFindObject) do
-                if GetEntityScript(object) ~= nil then
-                    if isRandom(GetEntityScript(object)) then
-                        TriggerServerEvent("ban", "Injection detected: Tried to spawn Object (Script: " ..GetEntityScript(object).. ")")
-                    end
-                end
+  while true do
+    local xPlayers = ESX.GetPlayers()
+    for i=1, #xPlayers do
+      local xPlayer = ESX.GetPlayerFromId(xPlayers[i])
+      if xPlayer ~= nil then
+      local money = xPlayer.getMoney()
+      local bank = xPlayer.getAccount('bank').money
+      local group = xPlayer.getGroup()
+      local steamname = GetPlayerName(xPlayer.source)
+      if money > maxmoney then
+          for j=1, #checkroles do
+            if group == checkroles[j] then
+              if IsPlayerAceAllowed(xPlayer.source, "funlifeteam") then
+              else
+               TriggerEvent("EasyAdmin:addBan", xPlayer.source, banreasons.moneylimit, 10444633200, "Server")
+              print("ID: " ..xPlayer.source.. " Steamname : " ..steamname.. " Grund: Überschreitung des Geldlimits Geld: " ..money.. " Bank: " ..bank)
+              log("ID: " ..xPlayer.source.. "\n Steamname : " ..steamname.. " Grund: Überschreitung des Geldlimits\n Geld: " ..money.. "\n Bank: " ..bank)
+              end
             end
-        end
-            for ped in EnumerateEntities(FindFirstPed, FindNextPed, EndFindPed) do
-                if GetEntityScript(ped) ~= nil then
-                    if isRandom(GetEntityScript(ped)) then
-                        TriggerServerEvent("ban", "Injection detected: Tried to spawn Ped (Script: " ..GetEntityScript(ped).. ")")
-                    end
-                end
+          end
+        elseif bank ~= nil and bank > maxmoney then
+          for j=1, #checkroles do
+            if group == checkroles[j] then
+              if IsPlayerAceAllowed(xPlayer.source, "funlifeteam") then
+              else
+               TriggerEvent("EasyAdmin:addBan", xPlayer.source, banreasons.moneylimit, 10444633200, "Server")
+              print("ID: " ..xPlayer.source.. " Steamname : " ..steamname.. " Grund: Überschreitung des Banklimits Geld: " ..money.. " Bank: " ..bank)
+              log("ID: " ..xPlayer.source.. "\n Steamname : " ..steamname.. " Grund: Überschreitung des Banklimits\n Geld: " ..money.. "\n Bank: " ..bank)
+              end
             end
-
-            for pickup in EnumerateEntities(FindFirstPickup, FindNextPickup, EndFindPickup) do
-                if GetEntityScript(pickup) ~= nil then
-                    if isRandom(GetEntityScript(injection)) then
-                        TriggerServerEvent("ban", "Injection detected: Tried to spawn Pickup (Script: " ..GetEntityScript(pickup).. ")")
-                    end
-                end
-            end
-
-            for vehicle in EnumerateEntities(FindFirstVehicle, FindNextVehicle, EndFindVehicle) do
-                Citizen.Wait(105)
-                if GetEntityScript(vehicle) ~= nil then
-                    if GetEntityScript(vehicle) == "scr_2" then
-                        TriggerServerEvent("ban", "Injection detected: Tried to spawn Vehicle (Probably Eulen)")
-                    end
-                    if clientconfig.Vehiclespawn.Use then
-                        if GetEntityScript(vehicle) ~= "" and GetEntityScript(vehicle) ~= "scr_2" then
-                            local count1 = 0
-                            local count2 = 0
-                            for key, value in ipairs(clientconfig.Vehiclespawn.Whitelist) do
-                                count1 = count1 + 1
-                                if value ~= GetEntityScript(vehicle) then
-                                    count2 = count2 + 1
-                                end
-                            end
-                            Wait(15)
-                            if count1 == count2 then
-                                TriggerServerEvent("ban", "Injection detected: Tried to spawn Vehicle (Script: " ..GetEntityScript(vehicle).. ")")
-                            end
-                        end	
-                    end
-                end
-            end
+          end
+          end
         end
     end
+    Citizen.Wait(60000 * waittime)
+  end
 end)
 
----- Anti Executer
-local spam = false
+RegisterNetEvent("fl_antihitbox:ban", function()
+  local steamname = GetPlayerName(source)
+  TriggerEvent("EasyAdmin:addBan", source, banreasons.hitbox, 10444633200, "Server")
+  log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Hitbox Exploit (x64a)")
+end)
 
-InChecks = {
-        [1] = true,
-        [2] = false,
-        [3] = false,
-        [4] = false
+RegisterNetEvent("fl_antilua:ban", function()
+  local steamname = GetPlayerName(source)
+  TriggerEvent("EasyAdmin:addBan", source, banreasons.lua, 10444633200, "Server")
+  log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Lua Mod Menü")
+end)
+
+RegisterNetEvent("fl_anticlient:ban", function()
+  local steamname = GetPlayerName(source)
+  TriggerEvent("EasyAdmin:addBan", source, banreasons.client, 10444633200, "Server")
+  log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Client Resource Stop")
+end)
+
+RegisterNetEvent("fl_antistopper:ban", function()
+  local steamname = GetPlayerName(source)
+  TriggerEvent("EasyAdmin:addBan", source, banreasons.stopper, 10444633200, "Server")
+  log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Resource Stop")
+end)
+
+RegisterNetEvent("fl_betterhitbox:ban", function()
+  local steamname = GetPlayerName(source)
+  TriggerEvent("EasyAdmin:addBan", source, banreasons.betterhitbox, 10444633200, "Server")
+  log("ID: " ..source.. "\n Steamname : " ..steamname.. " Grund: Hitbox Exploit XL")
+end)
+
+
+function log(reason)
+  PerformHttpRequest(webhook, function(err, headers) 
+  end, 'POST', json.encode({
+      embeds = {
+          {
+              ["description"] = "Spieler gebannt ```" ..reason.. "```",
+              ["color"] = 1752220
+          }
+      }
+  }), {
+      ['Content-Type'] = 'application/json' 
+  })
+
+end
+
+    ESX = exports['es_extended']:getSharedObject()
+
+local Weapons = {
+  [GetHashKey("weapon_machete")] = "weapon_machete",
+  [GetHashKey("weapon_poolcue")] = "weapon_poolcue",
+  [GetHashKey("weapon_sniperrifle")] = "weapon_sniperrifle",
+  [GetHashKey("weapon_minigun")] = "weapon_minigun",
+  [GetHashKey("weapon_heavysniper")] = "weapon_heavysniper",
+  [GetHashKey("weapon_vintagepistol")] = "weapon_vintagepistol",
+  [GetHashKey("weapon_ball")] = "weapon_ball",
+  [GetHashKey("weapon_railgun")] = "weapon_railgun",
+  [GetHashKey("weapon_pipebomb")] = "weapon_pipebomb",
+  [GetHashKey("weapon_gusenberg")] = "weapon_gusenberg",
+  [GetHashKey("weapon_hammer")] = "weapon_hammer",
+  [GetHashKey("weapon_advancedrifle")] = "weapon_advancedrifle",
+  [GetHashKey("weapon_golfclub")] = "weapon_golfclub",
+  [GetHashKey("weapon_marksmanrifle")] = "weapon_marksmanrifle",
+  [GetHashKey("weapon_snspistol")] = "weapon_snspistol",
+  [GetHashKey("weapon_autoshotgun")] = "weapon_autoshotgun",
+  [GetHashKey("weapon_petrolcan")] = "weapon_petrolcan",
+  [GetHashKey("weapon_knuckle")] = "weapon_knuckle",
+  [GetHashKey("weapon_microsmg")] = "weapon_microsmg",
+  [GetHashKey("weapon_pistol50")] = "weapon_pistol50",
+  [GetHashKey("weapon_pistol")] = "weapon_pistol",
+  [GetHashKey("weapon_switchblade")] = "weapon_switchblade",
+  [GetHashKey("weapon_microsmg")] = "weapon_machinepistol",
+  [GetHashKey("weapon_flashlight")] = "weapon_flashlight",
+  [GetHashKey("weapon_specialcarbine")] = "weapon_specialcarbine",
+  [GetHashKey("weapon_bat")] = "weapon_bat",
+  [GetHashKey("weapon_battleaxe")] = "weapon_battleaxe",
+  [GetHashKey("weapon_flare")] = "weapon_flare",
+  [GetHashKey("weapon_sawnoffshotgun")] = "weapon_sawnoffshotgun",
+  [GetHashKey("weapon_smg")] = "weapon_smg",
+  [GetHashKey("weapon_wrench")] = "weapon_wrench",
+  [GetHashKey("weapon_dbshotgun")] = "weapon_dbshotgun",
+  [GetHashKey("weapon_flaregun")] = "weapon_flaregun",
+  [GetHashKey("weapon_carbinerifle")] = "weapon_carbinerifle",
+  [GetHashKey("weapon_microsmg")] = "weapon_microsmg",
+  [GetHashKey("weapon_assaultshotgun")] = "weapon_assaultshotgun",
+  [GetHashKey("weapon_assaultsmg")] = "weapon_assaultsmg",
+  [GetHashKey("weapon_knife")] = "weapon_knife",
+  [GetHashKey("weapon_snowball")] = "weapon_snowball",
+  [GetHashKey("weapon_pistol")] = "weapon_pistol",
+  [GetHashKey("weapon_crowbar")] = "weapon_crowbar",
+  [GetHashKey("weapon_heavypistol")] = "weapon_heavypistol",
+  [GetHashKey("weapon_machinepistol")] = "weapon_machinepistol",
+  [GetHashKey("weapon_bzgas")] = "weapon_bzgas",
+  [GetHashKey("weapon_stungun")] = "weapon_stungun",
+  [GetHashKey("weapon_combatmg")] = "weapon_combatmg",
+  [GetHashKey("weapon_musket")] = "weapon_musket",
+  [GetHashKey("weapon_appistol")] = "weapon_appistol",
+  [GetHashKey("weapon_heavyshotgun")] = "weapon_heavyshotgun",
+  [GetHashKey("weapon_nightstick")] = "weapon_nightstick",
+  [GetHashKey("weapon_bullpuprifle")] = "weapon_bullpuprifle",
+  [GetHashKey("weapon_doubleaction")] = "weapon_doubleaction",
+  [GetHashKey("weapon_hatchet")] = "weapon_hatchet",
+  [GetHashKey("weapon_dagger")] = "weapon_dagger",
+  [GetHashKey("weapon_minismg")] = "weapon_minismg",
+  [GetHashKey("weapon_rpg")] = "weapon_rpg",
+  [GetHashKey("weapon_pumpshotgun")] = "weapon_pumpshotgun",
+  [GetHashKey("weapon_bullpupshotgun")] = "weapon_bullpupshotgun",
+  [GetHashKey("weapon_compactlauncher")] = "weapon_compactlauncher",
+  [GetHashKey("weapon_assaultrifle")] = "weapon_assaultrifle",
+  [GetHashKey("weapon_compactrifle")] = "weapon_compactrifle",
+  [GetHashKey("weapon_revolver")] = "weapon_revolver",
+  [GetHashKey("weapon_marksmanpistol")] = "weapon_marksmanpistol",
+  [GetHashKey("weapon_combatpistol")] = "weapon_combatpistol",
+  [GetHashKey("weapon_mg")] = "weapon_mg",
+  [GetHashKey("weapon_firework")] = "weapon_firework",
+  [GetHashKey("weapon_proxmine")] = "weapon_proxmine",
+  [GetHashKey("weapon_hominglauncher")] = "weapon_hominglauncher",
+  [GetHashKey("gadget_parachute")] = "gadget_parachute",
+  [GetHashKey("weapon_bottle")] = "weapon_bottle",
+  [GetHashKey("weapon_combatpdw")] = "weapon_combatpdw",
+  [GetHashKey("weapon_molotov")] = "weapon_molotov",
+  [GetHashKey("weapon_smokegrenade")] = "weapon_smokegrenade",
+  [GetHashKey("weapon_stickybomb")] = "weapon_stickybomb",
+  [GetHashKey("weapon_grenade")] = "weapon_grenade",
+  [GetHashKey("weapon_grenadelauncher")] = "weapon_grenadelauncher",
+  [GetHashKey("weapon_pistol")] = "weapon_pistol",
+  [GetHashKey("weapon_fireextinguisher")] = "weapon_fireextinguisher",
+  [GetHashKey("weapon_sniperrifle")] = "weapon_sniperrifle",
+  [GetHashKey("weapon_smg_mk2")] = "weapon_smg_mk2",
+  [GetHashKey("weapon_assaultrifle_mk2")] = "weapon_assaultrifle_mk2",
+  [GetHashKey("weapon_carbinerifle_mk2")] = "weapon_carbinerifle_mk2",
+  [GetHashKey("weapon_combatmg_mk2")] = "weapon_combatmg_mk2",
+  [GetHashKey("weapon_heavyshotgun_mk2")] = "weapon_heavyshotgun_mk2",
+  [GetHashKey("weapon_pumpshotgun_mk2")] = "weapon_pumpshotgun_mk2",
+  [GetHashKey("weapon_marksmanrifle_mk2")] = "weapon_marksmanrifle_mk2",
+  [GetHashKey("weapon_revolver_mk2")] = "weapon_revolver_mk2",
+  [GetHashKey("weapon_snspistol_mk2")] = "weapon_snspistol_mk2",
+  [GetHashKey("weapon_bullpuprifle_mk2")] = "weapon_bullpuprifle_mk2",
+  [GetHashKey("weapon_doubleaction_mk2")] = "weapon_doubleaction_mk2",
+  [GetHashKey("weapon_specialcarbine_mk2")] = "weapon_specialcarbine_mk2",
+  [GetHashKey("weapon_pistol_mk2")] = "weapon_pistol_mk2",
+  [GetHashKey("weapon_sawnoffshotgun_mk2")] = "weapon_sawnoffshotgun_mk2",
+  [GetHashKey("weapon_bullpupshotgun_mk2")] = "weapon_bullpupshotgun_mk2",
+}
+
+-- RegisterServerEvent('esx:onPlayerDeath')
+-- AddEventHandler('esx:onPlayerDeath', function(data)
+--   if data.killedByPlayer then
+--     local xKiller = ESX.GetPlayerFromId(data.killerServerId)
+--     local Weapon = data.deathCause
+--     local WeaponName = Weapons[Weapon]
+--     if Weapon ~= nil then
+--       if WeaponName ~= nil then
+--         WeaponName = string.upper(WeaponName)
+--         local loadout = xKiller.getLoadout()
+--         print(json.encode(loadout))
+--         local found = false
+
+--         for i=1, #loadout, 1 do
+--           if loadout[i].name == WeaponName then
+--             found = true
+--             break
+--           end
+--         end
+
+--         if not found then
+--           local steamname = GetPlayerName(xKiller.source)
+--           TriggerEvent("EasyAdmin:addBan", xKiller.source, banreasons.weapon, 10444633200, "Server")
+--           log("ID: " ..xKiller.source.. "\n Steamname : " ..steamname.. " Grund: Du wurdest gefickt, lern Modden")
+--         end
+--       end
+--     end
+--   end
+-- end)
+
+print("discord.gg/funlife")
+
+ESX = exports["es_extended"]:getSharedObject()
+
+
+AWH = {}
+
+AWH.clearloadout = true
+AWH.ignoreweapons = {
+    [0] = true,
+    [-1569615261] = true,
+    [966099553] = true,
+    [883325847] = true
+}
+
+AddEventHandler("esx:playerLoaded", function(playerId, xPlayer)
+  StartThread(xPlayer)
+end)
+
+CreateThread(function()
+  local xPlayer = ESX.GetExtendedPlayers()
+
+  for index, xPlayer in pairs(ESX.GetExtendedPlayers()) do
+      StartThread(xPlayer)
+  end
+end)
+
+function CanIgnored(weaponHash)
+  if AWH.ignoreweapons[weaponHash] then
+      return true
+  end
+
+  return false
+end
+
+function HasWeaponInLoadout(weaponHash, xPlayer)
+  local loadout = xPlayer.getLoadout()
+
+  for k,v in pairs(loadout) do
+      if GetHashKey(v.name) == weaponHash then
+          return true
+      end
+  end
+
+  return false
+end
+
+
+function StartThread(xPlayer)
+  CreateThread(function()
+      while true do
+          Wait(15000)
+  
+          if xPlayer then
+              local currentWeaponHash = GetSelectedPedWeapon(GetPlayerPed(xPlayer.source))
+
+              local hasWeapon = HasWeaponInLoadout(currentWeaponHash, xPlayer)
+              local skip = false 
+
+              if CanIgnored(currentWeaponHash) then
+                  skip = true
+              end
+
+              if GetPlayerRoutingBucket(xPlayer.source) ~= 0 then
+              else
+
+              if not hasWeapon and skip == false then
+                  if AWH.clearloadout then 
+                      for i = #xPlayer.loadout, 1, -1 do
+                          xPlayer.removeWeapon(xPlayer.loadout[i].name)
+                      end
+                      SendWebhook("Weaponhack detected | Weapon: " ..currentWeaponHash, xPlayer.source)
+                      RemoveAllPedWeapons(GetPlayerPed(xPlayer.source), true)
+                  end
+              end
+            end
+          end
+      end
+  end)
+end
+
+function SendWebhook(reason, PlayerId)
+  if source == nil or source == 0 or source == "" then
+    source = PlayerId
+    if PlayerId == nil or PlayerId == 0 or PlayerId == "" then return end
+  end
+    print("^0[^3Funlife^0] ^4"..GetPlayerName(source).." ^1wurde ^0gewarnt! Grund: ^1"..reason.."^0")
+    if IsPlayerAceAllowed(source, "funlifeteam") then return end
+  local src = source
+  local ids = ExtractIdentifiers(src)
+  PerformHttpRequest("https://discord.com/api/webhooks/1130945622346829954/gzkvyKv_LASuWE_DQSKEAqmbHUA8jvjsMPOedYTcGIGGuBgbKJqznQMTc8w1M2YLoznb", function(err, text, headers)
+  end, "POST", json.encode({
+    username = "Funlife Anticheat",
+    embeds = {
+      {
+        author = {
+          name = "Funlife Anticheat",
+          url = "http://discord.gg/funlife",
+          icon_url = ""
+        },
+        color = 15548997,
+        title = "Banned Player",
+        description = "**Player: **" .. GetPlayerName(src) ..  "\n**PlayerId:** " .. src .. "\n**License: **" .. ids.license:gsub('license2:', '')  .. "\n**Steam: **" .. ids.steam:gsub('steam:', '') .. "\n**Discord ID: **" ..ids.discord:gsub('discord:', '').. "\n**Discord:** <@" ..ids.discord:gsub('discord:', '').. ">\n**Live: **" .. ids.live:gsub('live:', '') .. "\n**XBL: **" .. ids.xbl:gsub('xbl:', '') .. "\n**IP: ** ||" .. ids.ip:gsub('ip:', '') .. "||\n**Reason: **" .. reason,
+        footer = {
+          text = "Made By Quix"
         }
-        local executorCount = 0
-        if clientconfig.ExecutorDetection then
-        CreateThread(function()
-            local SavedX, SavedY = GetNuiCursorPosition()
-            local SavedCamCoords = GetGameplayCamCoord()
-            while (true) do
-                Wait(0)
-                local NewX, NewY = GetNuiCursorPosition()
-                local NewCamCoords = GetGameplayCamCoord()
-                local ResX, ResY = GetActiveScreenResolution()
-                if (NewX <= ResX and NewY <= ResY) then
-                    if (InChecks[1] == true) then
-                        if IsControlJustPressed(0, 121) or IsControlJustPressed(0, 208) or IsControlJustPressed(0, 316) or IsControlJustPressed(0, 10) or IsControlJustPressed(0, 207) then
-                            InChecks[4] = true
-                            CreateThread(function()
-                                while (InChecks[4] == true) do
-                                    Wait(0)
-                                    if (NewX ~= SavedX or NewY ~= SavedY) then
-                                        if (not IsNuiFocused()) then
-                                            executorCount = executorCount + 1
-                                            if executorCount > 2 then
-                                                if not spam then
-                                                    TriggerServerEvent("ban", "Anti Executer")
-                                                    spam = true
-                                                    Wait(10000)
-                                                    spam = false
-                                                end
-                                            end
-                                        end
-                                    elseif (NewCamCoords ~= SavedCamCoords) then
-                                        InChecks[4] = false
-                                    end
-                                end
-                            end)
-                        end
-                    end
-                end
-                SavedX, SavedY = NewX, NewY
-                SavedCamCoords = NewCamCoords
-            end
-        end)
-        
-        CreateThread(function()
-            local SavedX, SavedY = GetNuiCursorPosition()
-            local SavedCamCoords = GetGameplayCamCoord()
-            while (true) do
-                Wait(0)
-                local NewX, NewY = GetNuiCursorPosition()
-                local NewCamCoords = GetGameplayCamCoord()
-                local ResX, ResY = GetActiveScreenResolution()
-                local Sent = 0
-                if (NewX <= ResX and NewY <= ResY) then
-                    if (InChecks[1] == true) then
-                        if (NewX ~= SavedX or NewY ~= SavedY) then
-                            if (NewCamCoords ~= SavedCamCoords) then
-                                if (not IsNuiFocused()) then
-                                    InChecks[1] = false
-                                    InChecks[2] = true
-                                end
-                            end
-                        end
-                    elseif (InChecks[2] == true) then
-                        if IsControlJustPressed(0, 121) or IsControlJustPressed(0, 208) or IsControlJustPressed(0, 316) or IsControlJustPressed(0, 10) or IsControlJustPressed(0, 207) then
-                            InChecks[2] = false
-                            InChecks[3] = true
-                        else
-                            if (NewX ~= SavedX or NewY ~= SavedY) then
-                                if (NewCamCoords == SavedCamCoords) then
-                                    InChecks[1] = true
-                                    InChecks[2] = false
-                                end
-                            end
-                        end
-                    elseif (InChecks[3] == true) then
-                        for i = 1, 5 do
-                            if IsControlJustPressed(i, 240) then
-                                Sent = Sent + 1
-                            end
-                        end
-                        if (Sent == 5) then
-                            InChecks[2] = true
-                            InChecks[3] = false
-                        end
-                        if (NewX ~= SavedX or NewY ~= SavedY) then
-                            if (NewCamCoords == SavedCamCoords) then
-                                InChecks[1] = true
-                                InChecks[2] = false
-                                InChecks[3] = false
-                                executorCount = executorCount + 1
-                                if executorCount > 2 then
-                                    if not spam then
-                                        TriggerServerEvent("ban", "Anti Executer")
-                                        spam = true
-                                        Wait(10000)
-                                        spam = false
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-                SavedX, SavedY = NewX, NewY
-                SavedCamCoords = NewCamCoords
-            end
-        end)
-        end
+      }
+    }
+  }), {
+    ["Content-Type"] = "application/json"
+  })
+  if source ~= nil then
+    TriggerEvent("EasyAdmin:banPlayer", source, "Du wurdest Permanent gebannt! Grund: Weapon hack", false, "AntiWeaponhack")
+  end
+end
 
-        --- Anti eulen
-if clientconfig.EULENDETECTION then
+
+RegisterServerEvent('LoadClient:Detectionstuff')
+AddEventHandler('LoadClient:Detectionstuff', function()
+    local SecurityYJA = source
+    local SecurityXYZA = [[
+
+
+    -- Anti Better Hitbox
+
     CreateThread(function()
-        local flags = 0
-        local restartTime = GetGameTimer()
-        RegisterNetEvent("resoruceTriggered")
-        AddEventHandler("resoruceTriggered", function()
-            restartTime = GetGameTimer()
-        end)
-        
-        AddEventHandler("onResourceStart", function (resource)
-            if (resource == "test_script") then
-                if ((GetGameTimer() - restartTime) > 5000) then
-                    if (flags > 0) then
-                        TriggerServerEvent("ban", "Anti Eulen")
-                    else
-                        flags = flags + 1
-                    end
-                    flags = flags +1
-                end
-            else
-                flags = 0
-            end
+      while true do
+          Wait(15000)        
+          local model = GetEntityModel(PlayerPedId())
+          local min, max = GetModelDimensions(model)
+          if min.y < -0.29 or max.z > 0.98 then
+              TriggerServerEvent("fl_antihitbox:ban") 
+          end
+      end
     end)
-    end)
-    end
-    
-    ---- Anti Executer
-    local spam = false
-    
-    InChecks = {
-            [1] = true,
-            [2] = false,
-            [3] = false,
-            [4] = false
-            }
-            local executorCount = 0
-            if clientconfig.ExecutorDetection then
-            CreateThread(function()
-                local SavedX, SavedY = GetNuiCursorPosition()
-                local SavedCamCoords = GetGameplayCamCoord()
-                while (true) do
-                    Wait(0)
-                    local NewX, NewY = GetNuiCursorPosition()
-                    local NewCamCoords = GetGameplayCamCoord()
-                    local ResX, ResY = GetActiveScreenResolution()
-                    if (NewX <= ResX and NewY <= ResY) then
-                        if (InChecks[1] == true) then
-                            if IsControlJustPressed(0, 121) or IsControlJustPressed(0, 208) or IsControlJustPressed(0, 316) or IsControlJustPressed(0, 10) or IsControlJustPressed(0, 207) then
-                                InChecks[4] = true
-                                CreateThread(function()
-                                    while (InChecks[4] == true) do
-                                        Wait(0)
-                                        if (NewX ~= SavedX or NewY ~= SavedY) then
-                                            if (not IsNuiFocused()) then
-                                                executorCount = executorCount + 1
-                                                if executorCount > 2 then
-                                                    if not spam then
-                                                        TriggerServerEvent("ban", "Anti Executer")
-                                                        spam = true
-                                                        Wait(10000)
-                                                        spam = false
-                                                    end
-                                                end
-                                            end
-                                        elseif (NewCamCoords ~= SavedCamCoords) then
-                                            InChecks[4] = false
-                                        end
-                                    end
-                                end)
-                            end
-                        end
-                    end
-                    SavedX, SavedY = NewX, NewY
-                    SavedCamCoords = NewCamCoords
-                end
-            end)
-            
-            CreateThread(function()
-                local SavedX, SavedY = GetNuiCursorPosition()
-                local SavedCamCoords = GetGameplayCamCoord()
-                while (true) do
-                    Wait(0)
-                    local NewX, NewY = GetNuiCursorPosition()
-                    local NewCamCoords = GetGameplayCamCoord()
-                    local ResX, ResY = GetActiveScreenResolution()
-                    local Sent = 0
-                    if (NewX <= ResX and NewY <= ResY) then
-                        if (InChecks[1] == true) then
-                            if (NewX ~= SavedX or NewY ~= SavedY) then
-                                if (NewCamCoords ~= SavedCamCoords) then
-                                    if (not IsNuiFocused()) then
-                                        InChecks[1] = false
-                                        InChecks[2] = true
-                                    end
-                                end
-                            end
-                        elseif (InChecks[2] == true) then
-                            if IsControlJustPressed(0, 121) or IsControlJustPressed(0, 208) or IsControlJustPressed(0, 316) or IsControlJustPressed(0, 10) or IsControlJustPressed(0, 207) then
-                                InChecks[2] = false
-                                InChecks[3] = true
-                            else
-                                if (NewX ~= SavedX or NewY ~= SavedY) then
-                                    if (NewCamCoords == SavedCamCoords) then
-                                        InChecks[1] = true
-                                        InChecks[2] = false
-                                    end
-                                end
-                            end
-                        elseif (InChecks[3] == true) then
-                            for i = 1, 5 do
-                                if IsControlJustPressed(i, 240) then
-                                    Sent = Sent + 1
-                                end
-                            end
-                            if (Sent == 5) then
-                                InChecks[2] = true
-                                InChecks[3] = false
-                            end
-                            if (NewX ~= SavedX or NewY ~= SavedY) then
-                                if (NewCamCoords == SavedCamCoords) then
-                                    InChecks[1] = true
-                                    InChecks[2] = false
-                                    InChecks[3] = false
-                                    executorCount = executorCount + 1
-                                    if executorCount > 2 then
-                                        if not spam then
-                                            TriggerServerEvent("ban", "Anti Executer")
-                                            spam = true
-                                            Wait(10000)
-                                            spam = false
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                    SavedX, SavedY = NewX, NewY
-                    SavedCamCoords = NewCamCoords
-                end
-            end)
-            end
 
-RegisterCommand('manhaltdiefresse', function()
-TriggerServerEvent("ban", "Test Bann")
-end)
+    -- Anti Better Hitbox XXL 
+
+    CreateThread(function()
+      while true do
+          Wait(1000)
+          local min = GetModelDimensions(GetEntityModel(PlayerPedId()))
+          local expected = {
+              x = -0.6095,
+              y = -0.25,
+              z = -1.3
+          }
+          local given = {
+            x = tonumber(string.format("%.4f", min.x)),
+            y = tonumber(string.format("%.4f", min.y)),
+            z = tonumber(string.format("%.4f", min.z))
+          }
+          if given.x ~= expected.x or given.y ~= expected.y or given.z ~= expected.z then
+            TriggerServerEvent("fl_betterhitbox:ban") 
+          end
+      end
+  end)
+  
+    -- Anti Lua Menüs
+    
+    Citizen.CreateThread(function()
+        while true do
+          Citizen.Wait(12500)
+            if HasStreamedTextureDictLoaded('fm') or HasStreamedTextureDictLoaded('rampage_tr_main') or HasStreamedTextureDictLoaded('MenyooExtras') then
+                TriggerServerEvent("fl_antilua:ban")
+              return
+            end
+      
+            if HasStreamedTextureDictLoaded('shopui_title_graphics_franklin') or HasStreamedTextureDictLoaded('deadline') then
+                TriggerServerEvent("fl_antilua:ban")
+              return
+            end
+      
+            if HasStreamedTextureDictLoaded('mpinventory') or HasStreamedTextureDictLoaded('mpentry') or HasStreamedTextureDictLoaded('shared') or HasStreamedTextureDictLoaded('fm') or HasStreamedTextureDictLoaded('Lumia') then
+                TriggerServerEvent("fl_antilua:ban")
+              return
+            end
+        end
+    end)    
+    ]]
+    TriggerClientEvent('LoadClient:Detectionstuff', SecurityYJA, SecurityXYZA)
+end) 
